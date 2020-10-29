@@ -1,33 +1,44 @@
+#include <bitset>
+
 #include "ac_int.h"
 
 template <int W>
-void csd_encode(ac_int<W,true> &num, ac_int<W,false> &x_p, ac_int<W,false> &x_m){
+void csd_encode(ac_int<W,true> &num, ac_int<(W+1),false> &x_p, ac_int<(W+1),false> &x_m){
     ac_int<1,false> carry = 0;
     ac_int<2,false> sliced ;
     ac_int<W,false> intermediate;
+    ac_int<W+1,false> input_num=0;
+    if(num>=0){
+    input_num=num;
+    //std::cout<<"input num "<<input_num<<std::endl;
+    input_num[W]=num[W-1];
+    //std::cout<<"input num "<<input_num<<std::endl;
+    }else{
+        input_num=num;
+    }
     x_p = 0;
     x_m = 0;
-
+    
     for (int i = 0; i < W-1; ++i){
-        sliced = num.template slc<2>(i);
-        // std::cout<<"sliced value : " <<sliced<<std::endl;
+        sliced = input_num.template slc<2>(i);
+        //std::cout<<"sliced value : " <<sliced<<std::endl;
         if(!carry){
             switch (sliced)
             {
             case 1:
-                // std::cout<<"inside case 1" <<std::endl;
+                //std::cout<<"inside case 1" <<std::endl;
                 carry = 0;
                 x_p[i] = 1;
                 x_m[i] = 0;
                 break;
             case 3:
-                // std::cout<<"inside case 3" <<std::endl;
+               // std::cout<<"inside case 3" <<std::endl;
                 carry = 1;
                 x_p[i] = 0;
                 x_m[i] = 1;
                 break;            
             default:
-                // std::cout<<"inside case default" <<std::endl;
+                //std::cout<<"inside case default" <<std::endl;
                 carry = 0;
                 x_p[i] = 0;
                 x_m[i] = 0;            
@@ -44,31 +55,43 @@ void csd_encode(ac_int<W,true> &num, ac_int<W,false> &x_p, ac_int<W,false> &x_m)
                 x_m[i] = 0;
                 break;
             case 2:
-                // std::cout<<"inside case 2" <<std::endl;
+                //std::cout<<"inside case 2" <<std::endl;
                 carry = 1;
                 x_p[i] = 0;
                 x_m[i] = 1;
                 break;            
             default:
-                // std::cout<<"inside case default carry=1" <<std::endl;
-                carry = 1;
-                x_p[i] = 0;
-                x_m[i] = 0;            
-                break;
+                if(i==W-1 && sliced==3){
+                    //std::cout<<"inside case default carry=1" <<std::endl;
+                    carry = 1;
+                    x_p[i] = 0;
+                    x_p[i+1] = 1;
+                    x_m[i-1] = 1;
+                    break;
+                } else {
+                    carry = 1;
+                    x_p[i] = 0;
+                    x_m[i] = 0;           
+                    break;
+                
+                }
             }
         }
     }
-    std::cout<<"x_p = "<<x_p<<std::endl;
+    
+    
+    std::bitset<W+1> x(x_p);
+    std::bitset<W+1> y(x_m);
     std::cout<<"x_m = "<<x_m<<std::endl;
-
+    std::cout<<"x_p = "<<x_p<<std::endl;
 }
 
 template <int W>
-ac_int<W,true> csd_mult(ac_int<W,true> &in, ac_int<W,false> &x_p, ac_int<W,false> &x_m){
-    ac_int<W,true> result = 0 ;
-    ac_int<W,false> shift ;
+ac_int<W+1,true> csd_mult(ac_int<W,true> &in, ac_int<W+1,false> &x_p, ac_int<W+1,false> &x_m){
+    ac_int<W+1,true> result = 0 ;
+    ac_int<W+1,false> shift ;
 
-    for(int i = 0; i < W; i++){
+    for(int i = 0; i < W+1; i++){
         //std::cout<<"iteration "<<i<<std::endl;
         if (x_p[i]==1){
             shift = in<<i; 
@@ -89,8 +112,8 @@ int main() {
     srand(time(NULL));
 
 
-    ac_int<BITS,false> x_m, x_p;
-    ac_int<BITS,true> result;
+    ac_int<BITS+1,false> x_m, x_p;
+    ac_int<2*BITS,true> result = 0;
     ac_int<BITS,true> word_to_encode=(-2^(BITS-1))+rand()%(((2^(BITS-1))-1)+2^(BITS-1) + 1);
     ac_int<BITS,true> constant =(-2^(BITS-1))+rand()%(((2^(BITS-1))-1)+2^(BITS-1) + 1); 
 
