@@ -44,6 +44,7 @@ int main(){
     for (int j = 0; j < 10; j=j+i){
         v2 = rand()% 3 + 1;
         v1 = rand() % 15;
+        i = 1;
         if(v2 + j < 10) {
             for (i = 0; i < v2; i++){
                 in.write(v1);
