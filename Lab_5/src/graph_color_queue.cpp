@@ -4,14 +4,10 @@
 
 
 // Generating a BFS list 
-void BFS_list(bool A[][6],int (&queue)[6]){
+void generating_queue(bool A[][6], short (&queue)[6]){
     bool visited[6]={1,0,0,0,0,0};
-    
-    int index =0;
-    int queue_index = 0;
-    queue[index]=0;
-    index++;
-    for(int i = queue[queue_index] ; i < 6; i++){
+    short index = 1;
+    for(int i = 0; i < 6; i++){
         for(int j = 0; j < 6; j++){
             if(A[i][j]==1 && visited[j]!=1){
                 //std::cout<<"Found v on "<<j<<std::endl;
@@ -21,10 +17,8 @@ void BFS_list(bool A[][6],int (&queue)[6]){
                 //for(int i=0 ;i<6;i++){
                 // std::cout<<visited[i];}
                 // std::cout<<std::endl;
-            }
-            
+            }      
         } 
-        queue_index++;
     }
 
     std::cout<<"Initiating queue ";
@@ -35,33 +29,29 @@ void BFS_list(bool A[][6],int (&queue)[6]){
 }
 
 // Examining if the chosen color for the node is valid
-void safe_coloring(bool A[][6],int (&color_table)[6],int node, int j){
-    bool found_color = 0;
-    for(int c=color_table[j]+1; c < 6; c++){
-        //color_table[j]=color_table[j]+1;
-        for(int i = 0; i < 6; i++){
-            //std::cout<<"Examining node "<<i<<std::endl;
-            if(A[j][i]==1 && c==color_table[i]){
-                std::cout<<"Cannot color with this "<<c<<std::endl;
-            }else if(found_color==0){
-                color_table[j]=c;
-                found_color=1;
-            }
+void safe_coloring(bool A[][6],short (&color_table)[6], int j){
+    int c;//for(int c=color_table[j]+1; c < 6; c++){
+    c=color_table[j]+1;
+    for(int i = 0; i < 6; i++){
+        if(A[j][i]==1 && c==color_table[i]){
+            c++;
         }
     }
+    color_table[j]=c;
 }
 
-// Top module
-void coloring(bool A[][6], int (&queue)[6], int (&color_table)[6]){ 
 
-    BFS_list(A,queue);
+// Top module
+void coloring(bool A[][6], short (&color_table)[6]){ 
+    short queue[6]={0,0,0,0,0,0};
+    generating_queue(A,queue);
 
     for(int i = 0;i < 6;i++){
         std::cout<<"Visiting node "<<queue[i]<<std::endl;
         for(int j = queue[i]; j < 6 ; j++){
             if(A[queue[i]][j]==1 && color_table[queue[i]]==color_table[j]){
                // std::cout<<"At E between  "<<queue[i]<<" and "<<j<<", "<<queue[i]<<" has "<<color_table[queue[i]]<<" and "<<j<<" has "<<color_table[j]<<std::endl;
-                safe_coloring(A,color_table,queue[i],j);
+                safe_coloring(A,color_table,j);
                 //std::cout<<"After, "<<j<<" has "<<color_table[j]<<std::endl;
             }  
         }
@@ -78,9 +68,7 @@ void coloring(bool A[][6], int (&queue)[6], int (&color_table)[6]){
 
 int main(){
     srand(time(NULL));
-    bool visited[6]={0,0,0,0,0,0};
-    int queue[6]={0,0,0,0,0,0};
-    int color_table[6] = {1, 1, 1, 1, 1, 1};
+    short color_table[6] = {1, 1, 1, 1, 1, 1};
     bool Adj_G[6][6];
 
     // Random graph
@@ -109,7 +97,7 @@ int main(){
     */
 
     
-    coloring(Adj_G,queue,color_table);
+    coloring(Adj_G,color_table);
 
 
     return 0;
