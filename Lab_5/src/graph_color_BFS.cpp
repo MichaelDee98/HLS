@@ -36,13 +36,17 @@ void BFS_list(bool A[][6],int (&queue)[6]){
 
 // Examining if the chosen color for the node is valid
 void safe_coloring(bool A[][6],int (&color_table)[6],int node, int j){
-    
-    color_table[j]=color_table[j]+1;
-    for(int i = 0; i < 6; i++){
-        //std::cout<<"Examining node "<<i<<std::endl;
-        if(A[j][i]==1 && color_table[j]==color_table[i]){
-            std::cout<<"Backtracking"<<std::endl;
-            safe_coloring(A,color_table,node,j);
+    bool found_color = 0;
+    for(int c=color_table[j]+1; c < 6; c++){
+        //color_table[j]=color_table[j]+1;
+        for(int i = 0; i < 6; i++){
+            //std::cout<<"Examining node "<<i<<std::endl;
+            if(A[j][i]==1 && c==color_table[i]){
+                std::cout<<"Cannot color with this "<<c<<std::endl;
+            }else if(found_color==0){
+                color_table[j]=c;
+                found_color=1;
+            }
         }
     }
 }
